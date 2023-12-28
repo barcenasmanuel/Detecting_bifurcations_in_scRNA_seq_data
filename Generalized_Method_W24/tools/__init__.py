@@ -4,3 +4,5 @@
 from .curve_interpolation import smooth_counts
 from .spliceJAC_functions import process_and_save_data
 from .jacobian_inference import traj_inference
+from .jacobian_inference import cell_capture
+from .jacobian_inference import create_weights_geneexpress

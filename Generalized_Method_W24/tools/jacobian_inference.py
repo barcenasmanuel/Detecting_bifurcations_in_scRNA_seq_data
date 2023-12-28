@@ -111,3 +111,10 @@ def cell_capture(adata, width=0.1, inc=0.05, nsim=10, frac=0.9):
         adata.uns['Cells_Captured'] = {'time': tm, 'gene_expression': geneexp_list, 'cells': cell_list,
                                        'pst_interval': ints,
                                        'inference_params': {'width': width, 'inc': inc, 'nsim': nsim, 'frac': frac}}
+
+
+def create_weights_geneexpress(processed_adata, filename, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=0.05, nsim=10,
+                               frac=0.9, b=1):
+    traj_inference(processed_adata, method=method, alpha=alpha, fit_int=fit_int, width=width, inc=inc, nsim=nsim , frac=frac, b=b)
+    cell_capture(processed_adata, width=width, inc=inc, nsim=nsim, frac=frac)
+    processed_adata.write_h5ad('gene_exp_'+filename+'.h5ad')

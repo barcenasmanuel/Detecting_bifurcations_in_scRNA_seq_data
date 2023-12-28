@@ -77,18 +77,18 @@ def one_gene(adata, gene, groupby='time', figname=None, order=None, ax=None):
         plt.savefig(figname, format='pdf', dpi=300)
 
 
-def plot_max_eig(adata, key='positive', figname=None, ax=None):
+def plot_max_eig(adata, key='positive', figname=None, ax=None, fig_width=5, fig_height=4, format_file='pdf', dpi=300):
     assert key == 'positive' or key == 'max', "Choose between key=='positive' or key='max'"
 
-    time, largest, positive = adata.uns['Jacobian']['time'], adata.uns['Jacobian']['largest'], \
-        adata.uns['Jacobian']['positive']
+    time, largest, positive = (adata.uns['Jacobian']['time'], adata.uns['Jacobian']['largest'],
+                               adata.uns['Jacobian']['positive'])
 
     avg_pos, avg_max = np.mean(positive, axis=1), np.mean(largest, axis=1)
     std_pos, std_max = np.std(positive, axis=1), np.std(largest, axis=1)
 
     generate_fig = False
     if ax == None:
-        fig = plt.figure(figsize=(5, 4))
+        fig = plt.figure(figsize=(fig_width, fig_height))
         ax = plt.subplot(111)
         generate_fig = True
 
@@ -104,8 +104,8 @@ def plot_max_eig(adata, key='positive', figname=None, ax=None):
     if generate_fig:
         plt.tight_layout()
         if figname == None:
-            figname = 'traj_stability.pdf'
-        plt.savefig(figname, format='pdf', dpi=300, bbox_inches='tight')
+            figname = f'traj_stability.{format_file}'
+        plt.savefig(figname, format=format_file, dpi=dpi, bbox_inches='tight')
 
 
 def plot_eigenspectrum(adata, point, title=True, figname=None, ax=None):
@@ -131,7 +131,8 @@ def plot_eigenspectrum(adata, point, title=True, figname=None, ax=None):
         plt.savefig(figname, format='pdf', dpi=300)
 
 
-def plot_stability(adata, filename_p, rep=1, sizefig=3.54, tick_size=small_size, axis_size=medium_size, format='png', dpi=300):
+def plot_stability(adata, filename_p, rep=1, sizefig=3.54, tick_size=small_size, axis_size=medium_size,
+                   format_file='png', dpi=300):
     # Ensure that the target directory exists
     target_directory = f'figures/{filename_p}/'
     os.makedirs(target_directory, exist_ok=True)
@@ -174,4 +175,27 @@ def plot_stability(adata, filename_p, rep=1, sizefig=3.54, tick_size=small_size,
 
     plt.tight_layout()
 
-    plt.savefig(f'{target_directory}regression_{filename_p}.{format}', format=format, bbox_inches='tight', dpi=dpi)
+    plt.savefig(f'{target_directory}regression_{filename_p}.{format_file}', format=format_file,
+                bbox_inches='tight', dpi=dpi)
+
+
+def spectrum_full(adata, filename_p=None, fig_width=10, fig_height=8, fig_key='positive', format_file='pdf'):
+    # Ensure that the target directory exists
+    if filename_p is not None:
+        target_directory = f'figures/{filename_p}/'
+        os.makedirs(target_directory, exist_ok=True)
+    else:
+        target_directory = 'figures/'
+        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+
+    fig=plt.figure(figsize=(fig_width, fig_height))
+    plot_max_eig(adata, key=fig_key, ax=plt.subplot(221))
+    plot_eigenspectrum(adata, 1, ax=plt.subplot(223))
+    plot_eigenspectrum(adata, 12, ax=plt.subplot(222))
+    plot_eigenspectrum(adata, 16, ax=plt.subplot(224))
+    plt.tight_layout()
+    if filename_p is not None:
+        plt.savefig(f'{target_directory}spectrum_{filename_p}.{format_file}', format=format_file)
+    else:
+        plt.savefig(f'{target_directory}spectrum.{format_file}', format=format_file)
+        print(f"Warning: filename_p is None. Saving as spectrum.{format_file}")
