@@ -47,8 +47,8 @@ def traj_inference(adata, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=
             indices = np.sort(
                 np.random.choice(np.arange(0, sel_U.shape[0], 1, dtype='int'), size=int(frac*sel_U.shape[0]),
                                  replace=False))
-            B, C, G = spliceJAC_functions.parameter_regression(sel_U[indices], sel_S[indices], method = method,
-                                                               alpha=alpha, fit_int= fit_int)
+            B, C, G = spliceJAC_functions.parameter_regression(sel_U[indices], sel_S[indices], method=method,
+                                                               alpha=alpha, fit_int=fit_int)
             int_mat = int_mat + B
 
             J = spliceJAC_functions.construct_jac(B, G, b=b)
