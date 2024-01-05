@@ -1,8 +1,7 @@
 import numpy as np
-import scanpy as sc
 from typing import List
 from ..tools import curve_interpolation
-from ..tools import spliceJAC_functions
+from ..tools import grn_inference
 
 
 def par_traj_inference(adata, width=0.1, inc=0.05, nsim=10, frac=0.9, method='Ridge', alpha=1, fit_int=True, b=1):
@@ -35,17 +34,17 @@ def par_traj_inference(adata, width=0.1, inc=0.05, nsim=10, frac=0.9, method='Ri
             indices = np.sort(
                 np.random.choice(np.arange(0, sel_U.shape[0], 1, dtype='int'), size=int(frac * sel_U.shape[0]),
                                  replace=False))
-            B, C, G = spliceJAC_functions.parameter_regression(sel_U[indices], sel_S[indices], method=method,
+            B, C, G = grn_inference.parameter_regression(sel_U[indices], sel_S[indices], method=method,
                                                                alpha=alpha, fit_int=fit_int)
             int_mat = int_mat + B
 
-            J = spliceJAC_functions.construct_jac(B, G, b=b)
+            J = grn_inference.construct_jac(B, G, b=b)
             w, v = np.linalg.eig(J)
             w = np.real(w)
             max_eig[i][j], pos[i][j] = np.amax(w), w[w > 0].size
         # average jacobian and spectrum
         int_mat = int_mat / nsim
-        J = spliceJAC_functions.construct_jac(int_mat, G, b=b)
+        J = grn_inference.construct_jac(int_mat, G, b=b)
         w, v = np.linalg.eig(J)
         w = np.real(w)
         eig_list.append(w)

@@ -1,7 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-
+import os
 import networkx as nx
 from scipy.stats import gaussian_kde
 
@@ -40,16 +40,45 @@ def comm_nodes(G):
     plt.savefig('figures/nodes_draw_test4c.pdf', format='pdf')
 
 
-def plot_comm(adata, num_com_list):
+def plot_comm(adata, num_com_list, filename_p=None, plot_tick=small_size, axis_label_size=medium_size,
+              fig_width=3.54, fig_height=3.54, fig_dpi=600, method_key='girvan_newman',
+              grn_type='gene_exp_weights', file_format='pdf'):
+    """
+    Plot the number of communities over pseudotime.
+
+    Parameters:
+    - adata (AnnData): Annotated data object containing pseudotime information.
+    - num_com_list (list): List of the number of communities corresponding to each pseudotime point.
+    - filename_p (str, optional): Output file name and directory (without extension).
+    - plot_tick (int): Font size for tick labels.
+    - axis_label_size (int): Font size for axis labels.
+    - fig_width (float): Width of the figure in inches.
+    - fig_height (float): Height of the figure in inches.
+    - fig_dpi (int): Dots per inch for the figure resolution.
+    - method_key (str): Key representing the community detection method.
+    - grn_type (str): Type of gene regulatory network (GRN) weights used.
+    - file_format (str): Output file format for saving the plot.
+
+    Returns:
+    None
+    """
+    # Ensure that the target directory exists
+    if filename_p is not None:
+        target_directory = f'figures/{filename_p}/'
+        os.makedirs(target_directory, exist_ok=True)
+    else:
+        target_directory = 'figures/'
+        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+
     tm = adata.uns['Jacobian']['time']
 
-    matplotlib.rc('xtick', labelsize=small_size)
-    matplotlib.rc('ytick', labelsize=small_size)
-    fig = plt.figure(figsize=(3.54, 3.54), dpi=600)  # original
+    matplotlib.rc('xtick', labelsize=plot_tick)
+    matplotlib.rc('ytick', labelsize=plot_tick)
+    fig = plt.figure(figsize=(fig_width, fig_height), dpi=fig_dpi)  # original
 
     plt.plot(tm, num_com_list, 'mo-')  # bo- #b--
-    plt.ylabel('Number of Communities', fontsize=medium_size)
-    plt.xlabel('Pseudotime', fontsize=medium_size)
+    plt.ylabel('Number of Communities', fontsize=axis_label_size)
+    plt.xlabel('Pseudotime', fontsize=axis_label_size)
 
     num_ticks = 6
     xtickpos = np.linspace(min(tm), max(tm), num_ticks)
@@ -57,30 +86,61 @@ def plot_comm(adata, num_com_list):
     plt.xticks(xtickpos)
     plt.yticks(ytickpos)
     plt.gca().yaxis.set_major_formatter(plt.FormatStrFormatter('%d'))  # set y as integers
-    # OVCA420_TGFB1
-    # No Gene expression
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_GirvanNewman2.pdf', format='pdf')
-    # Gene expression
-    # girvan newman
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_GirvanNewman1.pdf', format='pdf', bbox_inches='tight')
-    # greedy_modularity
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_greedyModularity1.pdf', format='pdf', bbox_inches='tight')
-    # OVCA420_EGF
-    # plt.savefig('figures/1st_draft/OVCA420_EGF/Ncomm_vs_pst_GirvanNewman1_OVCA420_EGF.pdf', format='pdf', bbox_inches='tight')
-    # plt.savefig('figures/1st_draft/OVCA420_EGF/Ncomm_vs_pst_greedyModularity1_OVCA420_EGF.pdf', format='pdf', bbox_inches='tight')
 
-def plot_comm_multi(adata, num_com_list1, num_com_list2, filename_p):
+    plt.savefig(f'{target_directory}{method_key}_{grn_type}_{filename_p}.{file_format}',
+                format=file_format, bbox_inches='tight', dpi=fig_dpi)
+
+
+def plot_comm_multi(adata, num_com_list1, num_com_list2, filename_p, plot_tick=small_size, axis_label_size=medium_size,
+                    legend_size=small_size, fig_width=3.54, fig_height=3.54, fig_dpi=300,
+                    method_key1='girvan_newman', method_key2='greedy_modularity', grn_type=None, file_format='pdf'):
+    """
+        Plot the number of communities over pseudotime for two different community detection methods.
+
+        Parameters:
+        - adata (AnnData): Annotated data object containing pseudotime information.
+        - num_com_list1 (list): List of the number of communities corresponding to method_key1.
+        - num_com_list2 (list): List of the number of communities corresponding to method_key2.
+        - filename_p (str): Output file name (without extension) and directory.
+        - plot_tick (int): Font size for tick labels.
+        - axis_label_size (int): Font size for axis labels.
+        - legend_size (int): Font size for legend.
+        - fig_width (float): Width of the figure in inches.
+        - fig_height (float): Height of the figure in inches.
+        - fig_dpi (int): Dots per inch for the figure resolution.
+        - method_key1 (str): Key representing the first community detection method.
+        - method_key2 (str): Key representing the second community detection method.
+        - grn_type (str, optional): Type of gene regulatory network (GRN) weights used. Default is None.
+        - file_format (str): Output file format for saving the plot. Default is 'pdf'.
+
+        Returns:
+        None
+
+        Saves a plot showing the number of communities over pseudotime for two different methods.
+        The plot is saved in the specified directory with a filename based on method keys and GRN type.
+
+        If filename_p is None, the plot is saved to the 'figures/' directory.
+        If grn_type is provided, it is included in the filename for better identification.
+    """
+    # Ensure that the target directory exists
+    if filename_p is not None:
+        target_directory = f'figures/{filename_p}/'
+        os.makedirs(target_directory, exist_ok=True)
+    else:
+        target_directory = 'figures/'
+        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+
     tm = adata.uns['Jacobian']['time']
 
-    matplotlib.rc('xtick', labelsize=small_size)
-    matplotlib.rc('ytick', labelsize=small_size)
-    fig = plt.figure(figsize=(3.54, 3.54))  # original #dpi=600
+    matplotlib.rc('xtick', labelsize=plot_tick)
+    matplotlib.rc('ytick', labelsize=plot_tick)
+    fig = plt.figure(figsize=(fig_width, fig_height))  # original #dpi=600
 
-    plt.plot(tm, num_com_list1, 'co-', label='Girvan_Newman')  #
-    plt.plot(tm, num_com_list2, 'mo-', label='Greedy_modularity')  # bo- #b--
-    plt.ylabel('Number of Communities', fontsize=8)
-    plt.xlabel('Pseudotime', fontsize=8)
-    plt.legend(loc='best', prop={'size': 6})
+    plt.plot(tm, num_com_list1, 'co-', label=method_key1)  #
+    plt.plot(tm, num_com_list2, 'mo-', label=method_key2)  # bo- #b--
+    plt.ylabel('Number of Communities', fontsize=axis_label_size)
+    plt.xlabel('Pseudotime', fontsize=axis_label_size)
+    plt.legend(loc='best', prop={'size': legend_size})
 
     print(f'num_com_list1: {num_com_list1}')
     print(f'num_com_list2: {num_com_list2}')
@@ -98,23 +158,14 @@ def plot_comm_multi(adata, num_com_list1, num_com_list2, filename_p):
     plt.xticks(xtickpos)
     plt.yticks(ytickpos)
     plt.gca().yaxis.set_major_formatter(plt.FormatStrFormatter('%d'))  # set y as integers
-    # OVCA420_TGFB1
-    # No Gene expression
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_GirvanNewman2.pdf', format='pdf')
-    # Gene expression
-    # girvan newman
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_GirvanNewman1.pdf', format='pdf', bbox_inches='tight')
-    # greedy_modularity
-    # plt.savefig('figures/1st_draft/Ncomm_vs_pst_greedyModularity1.pdf', format='pdf', bbox_inches='tight')
+
     # Multiple
-    plt.savefig(f'figures/1st_draft/{filename_p}/Ncomm_vs_pst_multi_methods2_{filename_p}.png', format='png',
-                bbox_inches='tight', dpi=300)
-    # greedy_modularity
-    # OVCA420_EGF
-    # plt.savefig('figures/1st_draft/OVCA420_EGF/Ncomm_vs_pst_GirvanNewman1_OVCA420_EGF.pdf', format='pdf', bbox_inches='tight')
-    # plt.savefig('figures/1st_draft/OVCA420_EGF/Ncomm_vs_pst_greedyModularity1_OVCA420_EGF.pdf', format='pdf', bbox_inches='tight')
-    # Multiple
-    # plt.savefig('figures/1st_draft/OVCA420_EGF/Ncomm_vs_pst_multi_methods1_OVCA420_EGF.pdf', format='pdf', bbox_inches='tight')
+    if grn_type is not None:
+        plt.savefig(f'{target_directory}Ncomm_vs_pst_multi_methods_{filename_p}_{grn_type}.{file_format}',
+                    format=file_format, bbox_inches='tight', dpi=fig_dpi)
+    else:
+        plt.savefig(f'{target_directory}Ncomm_vs_pst_multi_methods_{filename_p}.{file_format}',
+                    format=file_format, bbox_inches='tight', dpi=fig_dpi)
 
 
 def plot_distribution(G_list, filename_p):
@@ -152,7 +203,7 @@ def plot_distribution(G_list, filename_p):
     plt.grid(True)
     plt.legend(fontsize=4)
     # OVCA420_TGFB1
-    plt.xlim([-0.75, 0.75])  # for geneweight expression OVCA420_TGFB1
+    # plt.xlim([-0.75, 0.75])  # for geneweight expression OVCA420_TGFB1
     # plt.xlim([-0.25,0.25]) #for weight expression OVCA420_TGFB1
     # OVCA420_EGF
     # plt.xlim([-0.21,0.21])
@@ -164,5 +215,3 @@ def plot_distribution(G_list, filename_p):
     # plt.savefig('figures/1st_draft/OVCA420_EGF/geneWeight_distribution_OVCA420_EGF_A.pdf', format='pdf', bbox_inches='tight')
     plt.savefig(f'figures/1st_draft/{filename_p}/Weight_distribution_{filename_p}.png', format='png',
                 bbox_inches='tight', dpi=300)
-
-    print(f'End comm_plots.plot_distribution \nsee figure folder for figure')

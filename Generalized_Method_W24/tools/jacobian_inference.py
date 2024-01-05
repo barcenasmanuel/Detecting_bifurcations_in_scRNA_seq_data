@@ -1,25 +1,29 @@
 import numpy as np
 
 from ..tools import curve_interpolation
-from ..tools import spliceJAC_functions
+from ..tools import grn_inference
 
 
-def traj_inference(adata, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=0.05, nsim=10, frac=0.9, b=1):
-    '''
-    plain spliceJAC inference using the original datapoints without smoothing
-    :param adata:
-    :param method:
-    :param alpha:
-    :param fit_int:
-    :param width:
-    :param inc:
-    :param nsim:
-    :param frac:
-    :param b:
-    :return:
-    '''
+def traj_inference(adata, pst_key='dpt_pseudotime', method='Ridge', alpha=1, fit_int=True, width=0.1, inc=0.05, nsim=10, frac=0.9, b=1):
+    """
+        Perform plain spliceJAC inference using the original datapoints without smoothing.
 
-    pst = np.ndarray.flatten(np.asarray(adata.obs['dpt_pseudotime']))
+        Parameters:
+            adata (AnnData): Annotated data object.
+            pst_key (str): Key in `adata.obs` representing pseudotime.
+            method (str, optional): Regression method. Choose between 'Linear', 'Ridge', or 'Lasso'.
+            alpha (float, optional): Regularization coefficient for Ridge and Lasso.
+            fit_int (bool, optional): If True, set the fit_intercept parameter to True.
+            width (float, optional): Width of pseudotime intervals for inference.
+            inc (float, optional): Increment for defining pseudotime intervals.
+            nsim (int, optional): Number of simulations for each pseudotime interval.
+            frac (float, optional): Fraction of data used for each simulation.
+            b (float, optional): Splicing rate constant.
+
+        Returns:
+            None
+    """
+    pst = np.ndarray.flatten(np.asarray(adata.obs[pst_key]))
     ints = curve_interpolation.define_intervals(pst, width=width, inc=inc)
 
     tm, npoints = np.zeros(len(ints)), np.zeros(len(ints))
@@ -47,17 +51,17 @@ def traj_inference(adata, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=
             indices = np.sort(
                 np.random.choice(np.arange(0, sel_U.shape[0], 1, dtype='int'), size=int(frac*sel_U.shape[0]),
                                  replace=False))
-            B, C, G = spliceJAC_functions.parameter_regression(sel_U[indices], sel_S[indices], method=method,
+            B, C, G = grn_inference.parameter_regression(sel_U[indices], sel_S[indices], method=method,
                                                                alpha=alpha, fit_int=fit_int)
             int_mat = int_mat + B
 
-            J = spliceJAC_functions.construct_jac(B, G, b=b)
+            J = grn_inference.construct_jac(B, G, b=b)
             w, v = np.linalg.eig(J)
             w = np.real(w)
             max_eig[i][j], pos[i][j] = np.amax(w), w[w > 0].size
         # average jacobian and spectrum
         int_mat = int_mat/nsim
-        J = spliceJAC_functions.construct_jac(int_mat, G, b=b)
+        J = grn_inference.construct_jac(int_mat, G, b=b)
         w, v = np.linalg.eig(J)
         w = np.real(w)
         eig_list.append(w)
@@ -69,16 +73,19 @@ def traj_inference(adata, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=
 
 
 def cell_capture(adata, width=0.1, inc=0.05, nsim=10, frac=0.9):
-    '''
-    cells in the window of plain spliceJAC inference using the original datapoints without smoothing
-    :param adata:
-    :param width:
-    :param inc:
-    :param nsim:
-    :param frac:
-    :return:
-    '''
+    """
+        Capture cells in the window of plain spliceJAC inference using the original datapoints without smoothing.
 
+        Parameters:
+            adata (AnnData): Annotated data object.
+            width (float, optional): Width of pseudotime intervals for cell capture.
+            inc (float, optional): Increment for defining pseudotime intervals.
+            nsim (int, optional): Number of simulations for each pseudotime interval.
+            frac (float, optional): Fraction of data used for each simulation.
+
+        Returns:
+            None
+    """
     pst = np.ndarray.flatten(np.asarray(adata.obs['dpt_pseudotime']))
     ints = curve_interpolation.define_intervals(pst, width=width, inc=inc)
 
@@ -113,8 +120,27 @@ def cell_capture(adata, width=0.1, inc=0.05, nsim=10, frac=0.9):
                                        'inference_params': {'width': width, 'inc': inc, 'nsim': nsim, 'frac': frac}}
 
 
-def create_weights_geneexpress(processed_adata, filename, method='Ridge', alpha=1, fit_int=True, width=0.1, inc=0.05, nsim=10,
-                               frac=0.9, b=1):
-    traj_inference(processed_adata, method=method, alpha=alpha, fit_int=fit_int, width=width, inc=inc, nsim=nsim , frac=frac, b=b)
+def create_weights_geneexpress(processed_adata, filename, method='Ridge', alpha=1, fit_int=True,
+                               width=0.1, inc=0.05, nsim=10, frac=0.9, b=1):
+    """
+        Create weights for gene expression using plain spliceJAC inference and cell capture.
+
+        Parameters:
+            processed_adata (AnnData): Processed annotated data object.
+            filename (str): Base filename for saving the resulting data.
+            method (str, optional): Regression method. Choose between 'Linear', 'Ridge', or 'Lasso'.
+            alpha (float, optional): Regularization coefficient for Ridge and Lasso.
+            fit_int (bool, optional): If True, set the fit_intercept parameter to True.
+            width (float, optional): Width of pseudotime intervals for inference and cell capture.
+            inc (float, optional): Increment for defining pseudotime intervals.
+            nsim (int, optional): Number of simulations for each pseudotime interval.
+            frac (float, optional): Fraction of data used for each simulation.
+            b (float, optional): Splicing rate constant.
+
+        Returns:
+            None
+    """
+    traj_inference(processed_adata, method=method, alpha=alpha, fit_int=fit_int, width=width,
+                   inc=inc, nsim=nsim, frac=frac, b=b)
     cell_capture(processed_adata, width=width, inc=inc, nsim=nsim, frac=frac)
     processed_adata.write_h5ad('gene_exp_'+filename+'.h5ad')

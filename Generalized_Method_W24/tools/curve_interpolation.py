@@ -1,11 +1,19 @@
-'''
-Tools for curve interpolation
-'''
 import numpy as np
 import pandas as pd
 
 
 def define_intervals(pst, width=0.1, inc=0.001):
+    """
+        Define pseudotime intervals for curve smoothing.
+
+        Parameters:
+            pst (numpy.ndarray): Pseudotime values.
+            width (float, optional): Width of pseudotime intervals.
+            inc (float, optional): Increment for defining pseudotime intervals.
+
+        Returns:
+            list: List of pseudotime intervals.
+    """
     start, end = np.amin(pst), np.amax(pst)
     w = width*(end-start)
     endpoint = start+w
@@ -19,6 +27,18 @@ def define_intervals(pst, width=0.1, inc=0.001):
 
 
 def smooth_curve(pst, counts, intervals, rep=1):
+    """
+    Smooth a curve using averaging over pseudotime intervals.
+
+    Parameters:
+        pst (numpy.ndarray): Pseudotime values.
+        counts (numpy.ndarray): Curve values corresponding to pseudotime.
+        intervals (list): List of pseudotime intervals.
+        rep (int, optional): Number of smoothing repetitions.
+
+    Returns:
+        tuple: A tuple containing smoothed pseudotime and curve values.
+    """
     ref_pst, ref_counts = pst, counts
     for j in range(rep):
         avg_pst, avg_count = np.zeros(len(intervals)), np.zeros(len(intervals))
@@ -34,6 +54,16 @@ def smooth_curve(pst, counts, intervals, rep=1):
 
 
 def curve_average(y, rep=1):
+    """
+        Perform curve averaging over iterations.
+
+        Parameters:
+            y (numpy.ndarray): Curve values.
+            rep (int, optional): Number of averaging repetitions.
+
+        Returns:
+            numpy.ndarray: Averaged curve values.
+    """
     ref_y = y
     for j in range(rep):
         avg_y = y.copy()
@@ -46,6 +76,18 @@ def curve_average(y, rep=1):
 
 
 def smooth_counts(adata, width=0.1, inc=0.001, rep=1):
+    """
+        Smooth unspliced and spliced counts for each gene in the AnnData object.
+
+        Parameters:
+            adata (AnnData): Annotated data object.
+            width (float, optional): Width of pseudotime intervals for curve smoothing.
+            inc (float, optional): Increment for defining pseudotime intervals.
+            rep (int, optional): Number of smoothing repetitions.
+
+        Returns:
+            None
+    """
     geneset = list(adata.var_names)
     pst = np.ndarray.flatten(np.asarray(adata.obs['dpt_pseudotime']))
 

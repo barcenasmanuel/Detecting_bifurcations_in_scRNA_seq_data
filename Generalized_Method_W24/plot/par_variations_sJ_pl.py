@@ -15,6 +15,21 @@ large_size = 12
 
 def plot_traj_widthvar(processed_adata, filename=None, wsweep: List[float] = None, fig_width=5, fig_height=7,
                        legend_size=medium_size, file_format='pdf'):
+    """
+        Plot the trajectory analysis results with varying window width.
+
+        Parameters:
+        - processed_adata (AnnData): Processed annotated data object containing trajectory analysis results.
+        - filename (str, optional): Output file name and directory (without extension).
+        - wsweep (List[float], optional): List of window width values to sweep.
+        - fig_width (float): Width of the figure in inches.
+        - fig_height (float): Height of the figure in inches.
+        - legend_size (int): Font size for legend.
+        - file_format (str): Output file format for saving the plot.
+
+        Returns:
+        None
+    """
     # Ensure that the target directory exists
     if filename is not None:
         target_directory = f'figures/{filename}/'
@@ -119,6 +134,21 @@ def plot_traj_widthvar(processed_adata, filename=None, wsweep: List[float] = Non
 
 def plot_traj_incvar(processed_adata, filename=None, isweep: List[float] = None, fig_width=5, fig_height=7,
                      legend_size=medium_size, file_format='pdf'):
+    """
+        Plot the trajectory analysis results with varying window increase.
+
+        Parameters:
+        - processed_adata (AnnData): Processed annotated data object containing trajectory analysis results.
+        - filename (str, optional): Output file name and directory (without extension).
+        - isweep (List[float], optional): List of window increase values to sweep.
+        - fig_width (float): Width of the figure in inches.
+        - fig_height (float): Height of the figure in inches.
+        - legend_size (int): Font size for legend.
+        - file_format (str): Output file format for saving the plot.
+
+        Returns:
+        None
+    """
     # Ensure that the target directory exists
     if filename is not None:
         target_directory = f'figures/{filename}/'
@@ -223,6 +253,21 @@ def plot_traj_incvar(processed_adata, filename=None, isweep: List[float] = None,
 
 def plot_traj_nsimvar(adata, filename=None, nsweep: List[float] = None, fig_width=5, fig_height=7,
                       legend_size=medium_size, file_format='pdf'):
+    """
+        Plot the trajectory analysis results with varying number of simulations.
+
+        Parameters:
+        - adata (AnnData): Annotated data object containing trajectory analysis results.
+        - filename (str, optional): Output file name and directory (without extension).
+        - nsweep (List[float], optional): List of number of simulations values to sweep.
+        - fig_width (float): Width of the figure in inches.
+        - fig_height (float): Height of the figure in inches.
+        - legend_size (int): Font size for legend.
+        - file_format (str): Output file format for saving the plot.
+
+        Returns:
+        None
+    """
     # Ensure that the target directory exists
     if filename is not None:
         target_directory = f'figures/{filename}/'
@@ -328,6 +373,21 @@ def plot_traj_nsimvar(adata, filename=None, nsweep: List[float] = None, fig_widt
 
 def plot_traj_fracvar(adata, filename=None, fsweep: List[float] = None, fig_width=5, fig_height=7,
                       legend_size=medium_size, file_format='pdf'):
+    """
+        Plot the trajectory analysis results with varying fraction of cells in the window.
+
+        Parameters:
+        - adata (AnnData): Annotated data object containing trajectory analysis results.
+        - filename (str, optional): Output file name and directory (without extension).
+        - fsweep (List[float], optional): List of fraction of cells values to sweep.
+        - fig_width (float): Width of the figure in inches.
+        - fig_height (float): Height of the figure in inches.
+        - legend_size (int): Font size for legend.
+        - file_format (str): Output file format for saving the plot.
+
+        Returns:
+        None
+    """
     # Ensure that the target directory exists
     if filename is not None:
         target_directory = f'figures/{filename}/'
