@@ -1,6 +1,4 @@
 import os
-
-import numpy as np
 import scanpy as sc
 import scvelo as scv
 import Generalized_Method_W24 as gm
@@ -80,25 +78,21 @@ def main():
     # gm.tl.par_width_var(adata)
     # gm.pl.plot_traj_widthvar(adata, filename1)
 
-    # CD adata file generation
+    # Below community detection
     # adata = sc.read_h5ad(f'processed_{filename1}.h5ad')
-    # gm.tl.create_weights_geneexpress(adata, filename1)  # create adata with gene exp in windows
+    # gm.tl.create_weights_geneexpress(adata, filename1) # create adata with gene exp in windows
 
     # Community detection
-    # adata = sc.read_h5ad(f'gene_exp_{filename1}.h5ad')
-    # jac_list = adata.uns['Jacobian']['jacobians']  # stores range of Jacobians calculated
-    # geneexp_list = adata.uns['Cells_Captured']['gene_expression']  # stores range of mean expressions calculated
-    # G_list=gm.tl.G_listgen_a(adata, jac_list)
+    adata = sc.read_h5ad(f'gene_exp_{filename1}.h5ad')
+    jac_list = adata.uns['Jacobian']['jacobians']  # stores range of Jacobians calculated
+    geneexp_list = adata.uns['Cells_Captured']['gene_expression']  # stores range of mean expressions calculated
+    G_list=gm.tl.G_listgen_a(adata, jac_list)
     # Community_list1, Num_com_list1=gm.tl.cd_g_w(G_list)
     # gm.pl.plot_comm(adata, Num_com_list1, filename1)
 
     # G_list_2 = gm.tl.G_listgen_geneexp(adata, jac_list, geneexp_list)
-    # Community_list2, Num_com_list2=gm.tl.cd_grM_w(G_list)
-    # gm.pl.plot_comm(adata, Num_com_list2, filename1, method_key='greedy_modularity')
-
-    # Test numpy array load
-    load_indices = np.load('cell_indices_OVCA420_TGFB1.npy', allow_pickle=True)
-    print(f'Cell indices: {load_indices}')
+    Community_list2, Num_com_list2=gm.tl.cd_grM_w(G_list)
+    gm.pl.plot_comm(adata, Num_com_list2, filename1, method_key='greedy_modularity')
 
 
 if __name__ == '__main__':

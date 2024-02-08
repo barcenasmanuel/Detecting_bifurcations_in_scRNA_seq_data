@@ -104,7 +104,7 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
             # Print an error message or handle the case where t1 or t2 is out of range.
             print(f"Error: t1={t1} or t2={t2} is out of range of pseudotime values.")
             t2 = np.max(pst)
-            print(f'Fix: Assigned new t2 = {t2}')
+            print(f'Assigned new t2 = {t2}')
             C_window = Cell_data[(pst > t1) & (pst < t2), :]
             avg_Cellexp = np.mean(C_window, axis=0)
             geneexp_list.append(avg_Cellexp)
@@ -116,13 +116,11 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
             avg_Cellexp = np.mean(C_window, axis=0)
             geneexp_list.append(avg_Cellexp)
             C_index = np.ndarray.flatten(np.argwhere((pst > t1) & (pst < t2)))
-            # print(f'Cell {i} index shape: {C_index.shape} ')
             cell_list.append(C_index)
 
         tm[i] = (t1 + t2) / 2.
 
-    # np.save(f'cell_indices_{filename}.npy', cell_list)
-    np.savez(f'cell_indices_{filename}.npz', *cell_list)
+    np.save(f'cell_indices_{filename}.npy', cell_list)
     adata.uns['Cells_Captured'] = {'time': tm, 'gene_expression': geneexp_list, 'pst_interval': ints,
                                    'inference_params': {'width': width, 'inc': inc, 'nsim': nsim, 'frac': frac}}
 
