@@ -116,7 +116,6 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
             avg_Cellexp = np.mean(C_window, axis=0)
             geneexp_list.append(avg_Cellexp)
             C_index = np.ndarray.flatten(np.argwhere((pst > t1) & (pst < t2)))
-            # print(f'Cell {i} index shape: {C_index.shape} ')
             cell_list.append(C_index)
 
         tm[i] = (t1 + t2) / 2.
