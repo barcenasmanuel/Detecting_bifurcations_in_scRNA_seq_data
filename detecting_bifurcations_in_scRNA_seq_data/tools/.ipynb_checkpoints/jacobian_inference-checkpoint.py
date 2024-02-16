@@ -6,7 +6,7 @@ from ..tools import grn_inference
 
 def traj_inference(adata, pst_key='dpt_pseudotime', method='Ridge', alpha=1, fit_int=True, width=0.1, inc=0.05, nsim=10, frac=0.9, b=1):
     """
-        Perform plain spliceJAC inference using the original datapoints without smoothing.
+        Perform jacobian inference using the original datapoints without smoothing.
 
         Parameters:
             adata (AnnData): Annotated data object.
@@ -74,7 +74,7 @@ def traj_inference(adata, pst_key='dpt_pseudotime', method='Ridge', alpha=1, fit
 
 def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
     """
-        Capture cells in the window of plain spliceJAC inference using the original datapoints without smoothing.
+        Capture cells in the window of jacobian inference using the original datapoints without smoothing.
 
         Parameters:
             adata (AnnData): Annotated data object.
@@ -101,16 +101,13 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
         t1, t2 = ints[i][0], ints[i][1]
 
         if t1 < np.min(pst) or t2 > np.max(pst):
-            # Print an error message or handle the case where t1 or t2 is out of range.
-            print(f"Error: t1={t1} or t2={t2} is out of range of pseudotime values.")
             t2 = np.max(pst)
-            print(f'Assigned new t2 = {t2}')
+            print(f'Fix: Assigned new t2 = {t2}')
             C_window = Cell_data[(pst > t1) & (pst < t2), :]
             avg_Cellexp = np.mean(C_window, axis=0)
             geneexp_list.append(avg_Cellexp)
             C_index = np.ndarray.flatten(np.argwhere((pst > t1) & (pst < t2)))
             cell_list.append(C_index)
-            print(f"Error fixed proceed as normal")
         else:
             C_window = Cell_data[(pst > t1) & (pst < t2), :]
             avg_Cellexp = np.mean(C_window, axis=0)
@@ -120,7 +117,8 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
 
         tm[i] = (t1 + t2) / 2.
 
-    np.save(f'cell_indices_{filename}.npy', cell_list)
+    # np.save(f'cell_indices_{filename}.npy', cell_list)
+    np.savez(f'cell_indices_{filename}.npz', *cell_list)
     adata.uns['Cells_Captured'] = {'time': tm, 'gene_expression': geneexp_list, 'pst_interval': ints,
                                    'inference_params': {'width': width, 'inc': inc, 'nsim': nsim, 'frac': frac}}
 
@@ -128,7 +126,7 @@ def cell_capture(adata, filename, width=0.1, inc=0.05, nsim=10, frac=0.9):
 def create_weights_geneexpress(processed_adata, filename, method='Ridge', alpha=1, fit_int=True,
                                width=0.1, inc=0.05, nsim=10, frac=0.9, b=1):
     """
-        Create weights for gene expression using plain spliceJAC inference and cell capture.
+        Create weights for gene expression using functions traj_inference and cell_capture.
 
         Parameters:
             processed_adata (AnnData): Processed annotated data object.

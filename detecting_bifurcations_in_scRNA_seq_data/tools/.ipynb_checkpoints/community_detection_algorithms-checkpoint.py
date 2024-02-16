@@ -144,7 +144,7 @@ def between_method(G):
 
 
 def cd_g_w(adata, jac_list=None, g_list_method="G_list_gen_b", grn_list=None,
-           most_valuable_edge=between_method, wq=0.9):
+           most_val_edge=between_method, wq=0.9):
     """
         Detect communities in a graph based on weights of graph using girvan_newman method.
 
@@ -160,6 +160,7 @@ def cd_g_w(adata, jac_list=None, g_list_method="G_list_gen_b", grn_list=None,
         - Community_list: List of communities detected for each graph
         - Num_com_list: List of the number of communities for each graph
     """
+    print(f'Running cd_g_w: Girvan Newman with edge weights')
     if jac_list is None:
         jac_list = adata.uns['Jacobian']['jacobians']
 
@@ -183,7 +184,7 @@ def cd_g_w(adata, jac_list=None, g_list_method="G_list_gen_b", grn_list=None,
 
     # Community detection loop
     for i, g_list in enumerate(G_list):
-        comm_gen = girvan_newman(g_list, most_valuable_edge=most_valuable_edge)
+        comm_gen = girvan_newman(g_list, most_valuable_edge=most_val_edge)
         communities = [list(community) for community in next(comm_gen)]
         Community_list.append(communities)
 
@@ -212,6 +213,7 @@ def cd_g_nw(adata, jac_list=None, g_list_method="G_list_gen_b", grn_list=None, w
             - Community_list: List of communities detected for each graph
             - Num_com_list: List of the number of communities for each graph
         """
+    print(f'Running cd_g_nw: Girvan Newman no edge weights')
     if jac_list is None:
         jac_list = adata.uns['Jacobian']['jacobians']
 

@@ -133,6 +133,22 @@ def plot_eigenspectrum(adata, point, title=True, figname=None, ax=None):
 
 def plot_stability(adata, filename_p, rep=1, sizefig=3.54, tick_size=small_size, axis_size=medium_size,
                    format_file='png', dpi=300):
+    """
+    Plot stability analysis results.
+
+    Parameters:
+        adata (AnnData): Annotated data object containing stability analysis results.
+        filename_p (str): Output file name and directory (without extension).
+        rep (int): Number of repetitions for stability analysis. Default = 1
+        sizefig (float): Size of the figure in inches.
+        tick_size (int): Font size for tick labels.
+        axis_size (int): Font size for axis labels.
+        format_file (str): Output file format for saving the plot. (e.g. png, pdf)
+        dpi (int): Dots per inch for the figure resolution.
+
+    Returns:
+        None
+    """
     # Ensure that the target directory exists
     target_directory = f'figures/{filename_p}/'
     os.makedirs(target_directory, exist_ok=True)

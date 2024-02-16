@@ -69,7 +69,7 @@ def plot_comm(adata, num_com_list, filename_p=None, plot_tick=small_size, axis_l
         os.makedirs(target_directory, exist_ok=True)
     else:
         target_directory = 'figures/'
-        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+        print(f"Note: filename_p is None. Saving to 'figures/' directory.")
 
     tm = adata.uns['Jacobian']['time']
 
@@ -133,7 +133,7 @@ def plot_comm_multi(adata, num_com_list1, num_com_list2, filename_p, plot_tick=s
         os.makedirs(target_directory, exist_ok=True)
     else:
         target_directory = 'figures/'
-        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+        print(f"Note: filename_p is None. Saving to 'figures/' directory.")
 
     tm = adata.uns['Jacobian']['time']
 
@@ -175,13 +175,32 @@ def plot_comm_multi(adata, num_com_list1, num_com_list2, filename_p, plot_tick=s
 
 def plot_distribution(G_list, filename_p, plot_tick=small_size, axis_label_size=medium_size,legend_size=4,
                       fig_width=3.54, fig_height=3.54, fig_dpi=100, grn_type=None, xlim_p=None, file_format='png'):
+    """
+    Plot the distribution of edge weights for a list of gene regulatory networks (GRNs).
+
+    Parameters:
+        G_list (list): A list of networkx graphs representing GRNs.
+        filename_p (str): Output file name and directory (without extension).
+        plot_tick (int): Font size for tick labels.
+        axis_label_size (int): Font size for axis labels.
+        legend_size (int): Font size for legend.
+        fig_width (float): Width of the figure in inches.
+        fig_height (float): Height of the figure in inches.
+        fig_dpi (int): Dots per inch for the figure resolution.
+        grn_type (str): Type of GRN, if applicable.
+        xlim_p (tuple): Tuple specifying the range for the x-axis limit.
+        file_format (str): Output file format for saving the plot.
+
+    Returns:
+        None
+    """
     # Ensure that the target directory exists
     if filename_p is not None:
         target_directory = f'figures/{filename_p}/'
         os.makedirs(target_directory, exist_ok=True)
     else:
         target_directory = 'figures/'
-        print(f"Warning: filename_p is None. Saving to 'figures/' directory.")
+        print(f"Note: filename_p is None. Saving to 'figures/' directory.")
 
     all_edge_weights = []
     print(f'Running plot_distribution')
